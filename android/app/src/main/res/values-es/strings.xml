@@ -214,6 +214,13 @@
     <string name="stats_chart_daily_sleep">Sueño por día (horas)</string>
     <string name="stats_chart_wake_histogram">Cuánto tiempo pasa despierto (minutos)</string>
     <string name="stats_chart_description">%1$s. Mínimo %2$s, máximo %3$s.</string>
+    <string name="stats_chart_selected">%1$s · %2$s</string>
+    <string name="stats_chart_wake_bin">%1$d–%2$d min</string>
+    <plurals name="stats_chart_times">
+        <item quantity="one">%1$d vez</item>
+        <item quantity="many">%1$d de veces</item>
+        <item quantity="other">%1$d veces</item>
+    </plurals>
     <string name="stats_diaper_breakdown">Pipí %1$d · Caca %2$d · Ambos %3$d</string>
     <string name="stats_diapers_per_day">Pañales al día</string>
     <string name="stats_sleep_total">Sueño total</string>

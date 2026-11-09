@@ -110,7 +110,7 @@ That is what makes them deterministic and testable.
 | Background | WorkManager | Sync with network constraint and backoff. |
 | Settings | DataStore (Preferences) | Language is handled by the platform, see §8. |
 | Token storage | DataStore, values encrypted with an Android Keystore AES-GCM key | `security-crypto` is deprecated; this is the same mechanism without the dependency. |
-| Charts | Compose `Canvas` bar charts (`ui/stats/BarChart.kt`) | The statistics only need single-series bars; a chart library would be the largest dependency in the app for that. Each chart is one screen-reader element with a text summary. |
+| Charts | Compose `Canvas` bar charts (`ui/stats/BarChart.kt`) | The statistics only need single-series bars; a chart library would be the largest dependency in the app for that. Each chart is one screen-reader element with a text summary; tapping or dragging across a chart shows the touched bar's label and value in its header. |
 | Min / target / compile SDK | 26 / 36 / 37 | 26 gives `java.time` without desugaring; current AndroidX requires compiling against 37. |
 | Application ID | `eu.elraro.babytracker` | Change before a first release if another ID is wanted; it cannot change afterwards. |
 | Build | Gradle 9.8 wrapper, AGP 9.4 (built-in Kotlin), versions in `gradle/libs.versions.toml`; compiles with a JDK 21 toolchain | |

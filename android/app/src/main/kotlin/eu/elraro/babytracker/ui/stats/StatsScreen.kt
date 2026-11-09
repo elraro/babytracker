@@ -40,6 +40,7 @@ import eu.elraro.babytracker.stats.Distribution
 import eu.elraro.babytracker.stats.Feeding
 import eu.elraro.babytracker.stats.Patterns
 import eu.elraro.babytracker.stats.Sleep
+import eu.elraro.babytracker.stats.WAKE_HISTOGRAM_BIN_S
 import eu.elraro.babytracker.stats.WakeWindows
 import eu.elraro.babytracker.ui.common.EmptyState
 import eu.elraro.babytracker.ui.common.ErrorText
@@ -303,12 +304,12 @@ private fun FeedingCard(
         BarChart(
             title = stringResource(R.string.stats_chart_daily_ml),
             bars = feeding.daily.map { Bar(it.totalMl.toFloat(), dayLabel(it.date, formatters)) },
-            formatValue = { it.toInt().toString() },
+            formatValue = { ml(it.toInt()) },
         )
         BarChart(
             title = stringResource(R.string.stats_chart_by_hour),
             bars = feeding.byHour.map { Bar(it.totalMl.toFloat(), formatters.timeOfDay(it.hour * SECONDS_PER_MINUTE)) },
-            formatValue = { it.toInt().toString() },
+            formatValue = { ml(it.toInt()) },
         )
     }
 }
@@ -494,8 +495,13 @@ private fun WakeWindowsCard(windows: WakeWindows) {
         }
         BarChart(
             title = stringResource(R.string.stats_chart_wake_histogram),
-            bars = windows.histogram.map { Bar(it.count.toFloat(), (it.fromS / SECONDS_PER_MINUTE).toString()) },
-            formatValue = { it.toInt().toString() },
+            bars =
+                windows.histogram.map {
+                    val from = it.fromS / SECONDS_PER_MINUTE
+                    val to = (it.fromS + WAKE_HISTOGRAM_BIN_S) / SECONDS_PER_MINUTE
+                    Bar(it.count.toFloat(), from.toString(), stringResource(R.string.stats_chart_wake_bin, from, to))
+                },
+            formatValue = { pluralStringResource(R.plurals.stats_chart_times, it.toInt(), it.toInt()) },
         )
     }
 }

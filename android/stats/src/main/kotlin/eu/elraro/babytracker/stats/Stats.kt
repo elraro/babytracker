@@ -17,7 +17,9 @@ private const val MIN_START_BUCKET = 4
 private const val MIN_CHANGE_SAMPLE = 5
 
 private const val MAX_NAP_ORDINAL = 5
-private const val HISTOGRAM_BIN_S = 15 * 60
+
+/** Width of a bin of the wake-window histogram, in seconds (docs/STATISTICS.md). */
+const val WAKE_HISTOGRAM_BIN_S = 15 * 60
 private const val START_BUCKET_MIN = 30
 private const val CHANGE_PERIOD_DAYS = 7
 private const val MAX_DAYS = 366
@@ -258,7 +260,7 @@ private class Computation(
     private fun wakeWindows(): WakeWindows {
         val inRange = windowsEndingIn(from, to)
         val maxOrdinal = inRange.maxOfOrNull { it.ordinal } ?: 0
-        val maxBin = inRange.maxOfOrNull { it.duration / HISTOGRAM_BIN_S } ?: -1
+        val maxBin = inRange.maxOfOrNull { it.duration / WAKE_HISTOGRAM_BIN_S } ?: -1
         return WakeWindows(
             overall = distribution(inRange.map { it.duration }, MIN_WAKE_WINDOWS),
             byOrdinal =
@@ -270,7 +272,10 @@ private class Computation(
                 },
             histogram =
                 (0..maxBin).map { bin ->
-                    HistogramBin(bin * HISTOGRAM_BIN_S, inRange.count { it.duration / HISTOGRAM_BIN_S == bin })
+                    HistogramBin(
+                        bin * WAKE_HISTOGRAM_BIN_S,
+                        inRange.count { it.duration / WAKE_HISTOGRAM_BIN_S == bin },
+                    )
                 },
         )
     }

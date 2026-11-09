@@ -209,6 +209,13 @@
     <string name="stats_chart_daily_sleep">Sleep per day (hours)</string>
     <string name="stats_chart_wake_histogram">How long the baby stays awake (minutes)</string>
     <string name="stats_chart_description">%1$s. Lowest %2$s, highest %3$s.</string>
+    <!-- A tapped chart bar: "%1$s" names the bar (a day, an hour, a range), "%2$s" is its value. -->
+    <string name="stats_chart_selected">%1$s · %2$s</string>
+    <string name="stats_chart_wake_bin">%1$d–%2$d min</string>
+    <plurals name="stats_chart_times">
+        <item quantity="one">%1$d time</item>
+        <item quantity="other">%1$d times</item>
+    </plurals>
     <string name="stats_diaper_breakdown">Wet %1$d · Dirty %2$d · Both %3$d</string>
     <string name="stats_diapers_per_day">Diapers per day</string>
     <string name="stats_sleep_total">Total sleep</string>
