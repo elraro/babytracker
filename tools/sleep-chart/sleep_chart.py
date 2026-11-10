@@ -15,10 +15,11 @@ is split at midnight. Hours before the first and after the last record are "no d
 from __future__ import annotations
 
 import argparse
+import calendar
 import csv
 import sys
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 DAY = 1440  # minutes
@@ -139,6 +140,13 @@ def load(path: Path):
     return [days[d] for d in sorted(days)], birth_day, zones
 
 
+def age_in_months(birth: date, day: date) -> int:
+    """Completed calendar months; a birthday on the 31st falls on the last day of shorter months."""
+    months = (day.year - birth.year) * 12 + day.month - birth.month
+    anniversary = min(birth.day, calendar.monthrange(day.year, day.month)[1])
+    return months - (day.day < anniversary)
+
+
 def hm(m: float) -> str:
     m = round(m)
     return f"{m // 60}:{m % 60:02d}"
@@ -199,13 +207,15 @@ def draw(days: list[Day], birth_day: int, zones: list[str], out: Path, theme: st
     for s in ax.spines.values():
         s.set_visible(False)
 
-    # Month markers (age in months, 30.44-day months) on the left of the first row of each month.
+    # Age in completed calendar months, marked on the row where it changes (the monthly birthday).
+    birth = date_of(birth_day).date()
     last_month = None
     for i, d in enumerate(days):
-        month = int((d.day - birth_day) // 30.4375) + 1
+        month = age_in_months(birth, date_of(d.day).date())
         if month != last_month:
-            # In its own column left of the day labels, level with the month's first day.
-            ax.text(-0.118, i, f"MONTH {month}", transform=ax.get_yaxis_transform(), ha="right",
+            # In its own column left of the day labels, level with that day.
+            label = "1 MONTH" if month == 1 else f"{month} MONTHS"
+            ax.text(-0.118, i, label, transform=ax.get_yaxis_transform(), ha="right",
                     va="center", fontsize=7.5, fontweight="bold", color=t["text"])
             if last_month is not None:
                 ax.axhline(i - 0.5, color=t["muted"], lw=0.6, ls=(0, (2, 3)), xmax=1, zorder=4)

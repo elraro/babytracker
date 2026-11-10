@@ -30,6 +30,8 @@ throw-away environment; with plain Python, `pip install matplotlib` and run it w
 - **Awake** is the gap between two recorded sleeps. The app does not record crying.
 - Rows are calendar days, so a night is split at midnight. The longest stretch is
   counted on the merged night, not on the two halves.
+- "Day N" is days since birth (the birth date is day 0); "3 MONTHS" marks the row of the
+  monthly birthday on which the baby turns 3 months old (calendar months).
 - Grey ("no data") is the time before the first and after the last record. A sleep
   that was never ended counts as lasting until the last record.
 - The averages in the subtitle use complete days only; the first and last days are
