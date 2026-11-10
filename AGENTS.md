@@ -52,6 +52,7 @@ server/      Go module: cmd/babytracker, internal/{config,httpapi,auth,syncsvc,s
 android/     Gradle project: app/ (UI, data, sync, DI), stats/ (pure Kotlin statistics engine)
 testdata/    stats/ golden fixtures shared by the Go and Kotlin engines
 deploy/      reverse proxy config, backup scripts
+tools/       one-off helpers run by hand (sleep-chart: export + PNG); not part of the app
 ```
 
 ## 5. How to work

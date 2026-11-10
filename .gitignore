@@ -48,3 +48,7 @@ pgdata/
 # Gradle wrapper jar is required to build
 !android/gradle/wrapper/gradle-wrapper.jar
 backups/
+
+# Exports and charts made with tools/sleep-chart (real baby data)
+/*.csv
+/*.png
