@@ -1,5 +1,7 @@
 package eu.elraro.babytracker.ui.stats
 
+import android.content.ActivityNotFoundException
+import android.content.res.Resources
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,16 +23,21 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Bedtime
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -39,6 +46,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -57,6 +67,9 @@ import eu.elraro.babytracker.ui.common.EmptyState
 import eu.elraro.babytracker.ui.common.Formatters
 import eu.elraro.babytracker.ui.common.durationText
 import eu.elraro.babytracker.ui.common.rememberFormatters
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.Duration
 
 private const val DAY_S = 24 * 60 * 60f
@@ -107,10 +120,22 @@ fun SleepChartContent(
     state: SleepChartUiState,
     onBack: () -> Unit,
 ) {
+    val share = rememberShareImage(state.days)
     Scaffold(
+        snackbarHost = { SnackbarHost(share.snackbar) },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.sleep_chart_title)) },
+                actions = {
+                    if (state.days.isNotEmpty()) {
+                        IconButton(onClick = share.start, enabled = !share.working) {
+                            Icon(
+                                imageVector = Icons.Outlined.Share,
+                                contentDescription = stringResource(R.string.sleep_chart_share),
+                            )
+                        }
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -130,6 +155,92 @@ fun SleepChartContent(
             else -> ChartList(state.days, modifier)
         }
     }
+}
+
+/** The share button's state: busy while the image is drawn and written. */
+private class ShareImage(
+    val start: () -> Unit,
+    val working: Boolean,
+    val snackbar: SnackbarHostState,
+)
+
+/**
+ * Draws [days] as an image in the colours and language on screen and opens the share sheet.
+ * Only the user's choice of app sends it anywhere.
+ */
+@Composable
+private fun rememberShareImage(days: List<ChartDay>): ShareImage {
+    val context = LocalContext.current
+    val resources = LocalResources.current
+    val formatters = rememberFormatters()
+    val colors = imageColors()
+    val scope = rememberCoroutineScope()
+    val snackbar = remember { SnackbarHostState() }
+    var working by remember { mutableStateOf(false) }
+    val error = stringResource(R.string.sleep_chart_share_error)
+    val title = stringResource(R.string.sleep_chart_share_title)
+    val start: () -> Unit = {
+        working = true
+        scope.launch {
+            val text = imageText(resources, formatters, days.size)
+            val bitmap = withContext(Dispatchers.Default) { SleepChartImage.render(days, text, colors) }
+            val uri = ChartShare.write(context, bitmap)
+            working = false
+            val opened =
+                uri != null &&
+                    try {
+                        context.startActivity(ChartShare.chooser(uri, title))
+                        true
+                    } catch (_: ActivityNotFoundException) {
+                        false
+                    }
+            if (!opened) snackbar.showSnackbar(error)
+        }
+    }
+    return ShareImage(start, working, snackbar)
+}
+
+@Composable
+private fun imageColors(): ChartImageColors {
+    val scheme = MaterialTheme.colorScheme
+    val chart = chartColors()
+    return ChartImageColors(
+        background = scheme.surface.toArgb(),
+        text = scheme.onSurface.toArgb(),
+        muted = scheme.onSurfaceVariant.toArgb(),
+        heading = scheme.primary.toArgb(),
+        sleep = chart.sleep.toArgb(),
+        awake = chart.awake.toArgb(),
+        bottle = chart.bottle.toArgb(),
+        track = chart.track.toArgb(),
+        grid = chart.grid.toArgb(),
+    )
+}
+
+/** The image's words, read from [resources] so that they follow the app's language. */
+private fun imageText(
+    resources: Resources,
+    formatters: Formatters,
+    dayCount: Int,
+): ChartImageText {
+    val note = resources.getString(R.string.sleep_chart_note)
+    val max = SleepChartImage.MAX_DAYS
+    return ChartImageText(
+        title = resources.getString(R.string.sleep_chart_title),
+        legendSleep = resources.getString(R.string.sleep_chart_legend_sleep),
+        legendAwake = resources.getString(R.string.sleep_chart_legend_awake),
+        legendBottle = resources.getString(R.string.sleep_chart_legend_bottle),
+        hours = (0 until HOURS_PER_DAY step HOURS_PER_TICK).map(formatters::hour),
+        note =
+            if (dayCount > max) {
+                note + " " + resources.getQuantityString(R.plurals.sleep_chart_image_limited, max, max)
+            } else {
+                note
+            },
+        month = { resources.getQuantityString(R.plurals.sleep_chart_age, it, it) },
+        date = formatters::dayMonth,
+        total = { resources.getString(R.string.sleep_chart_hours, formatters.tenths(hoursX10(it))) },
+    )
 }
 
 @Composable

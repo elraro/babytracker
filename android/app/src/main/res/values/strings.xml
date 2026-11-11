@@ -314,6 +314,13 @@ The statistics themselves are always calculated by the app, not by the AI.</stri
         <item quantity="one">%1$d bottle (%2$d ml)</item>
         <item quantity="other">%1$d bottles (%2$d ml)</item>
     </plurals>
+    <string name="sleep_chart_share">Share as image</string>
+    <string name="sleep_chart_share_title">Share the sleep chart</string>
+    <string name="sleep_chart_share_error">The image could not be created.</string>
+    <plurals name="sleep_chart_image_limited">
+        <item quantity="one">Showing the last %1$d day.</item>
+        <item quantity="other">Showing the last %1$d days.</item>
+    </plurals>
     <string name="stats_growth">Growth</string>
     <string name="growth_weight">Weight</string>
     <string name="growth_height">Height</string>

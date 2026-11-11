@@ -322,6 +322,14 @@ Las estadísticas las calcula siempre la aplicación, no la IA.</string>
         <item quantity="many">%1$d de biberones (%2$d ml)</item>
         <item quantity="other">%1$d biberones (%2$d ml)</item>
     </plurals>
+    <string name="sleep_chart_share">Compartir como imagen</string>
+    <string name="sleep_chart_share_title">Compartir la gráfica de sueño</string>
+    <string name="sleep_chart_share_error">No se ha podido crear la imagen.</string>
+    <plurals name="sleep_chart_image_limited">
+        <item quantity="one">Se muestra solo %1$d día.</item>
+        <item quantity="many">Se muestran los últimos %1$d de días.</item>
+        <item quantity="other">Se muestran los últimos %1$d días.</item>
+    </plurals>
     <string name="stats_growth">Crecimiento</string>
     <string name="growth_weight">Peso</string>
     <string name="growth_height">Altura</string>
