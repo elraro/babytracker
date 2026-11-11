@@ -25,8 +25,8 @@ No public registration, no social features, no ads, no analytics.
 | 8 | AI | done |
 | 9 | Polish | done |
 
-Known gaps and things not yet verified (Docker stack, a real AI provider, release
-signing) are listed in
+Known gaps and things not yet verified (Docker stack, a real AI provider, the
+signed release on a phone) are listed in
 [docs/ARCHITECTURE.md §12](docs/ARCHITECTURE.md#12-known-gaps).
 
 ## Documentation

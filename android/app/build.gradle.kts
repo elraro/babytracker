@@ -17,10 +17,25 @@ android {
         applicationId = "eu.elraro.babytracker"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
+        // CI passes its run number so that each build installs over the previous one.
+        versionCode = providers.environmentVariable("BT_VERSION_CODE").orNull?.toInt() ?: 1
         versionName = "0.1.0"
         // Languages the app is translated into; keeps library strings in other languages out.
         androidResources.localeFilters += listOf("en", "es")
+    }
+
+    // The release key is never in the repository. CI writes it from secrets and passes these
+    // variables (docs/ARCHITECTURE.md §12); without them `assembleRelease` stays unsigned.
+    val releaseStore = providers.environmentVariable("BT_SIGNING_STORE_FILE").orNull
+    signingConfigs {
+        if (releaseStore != null) {
+            create("release") {
+                storeFile = file(releaseStore)
+                storePassword = providers.environmentVariable("BT_SIGNING_STORE_PASSWORD").get()
+                keyAlias = providers.environmentVariable("BT_SIGNING_KEY_ALIAS").get()
+                keyPassword = providers.environmentVariable("BT_SIGNING_KEY_PASSWORD").get()
+            }
+        }
     }
 
     buildTypes {
@@ -33,6 +48,7 @@ android {
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             buildConfigField("boolean", "ALLOW_CLEARTEXT", "false")
+            signingConfigs.findByName("release")?.let { signingConfig = it }
         }
         // The release build (minified, not debuggable) signed with the debug key and allowed to
         // use plain HTTP: for checking the shrunk app against a local server. Never distribute it.

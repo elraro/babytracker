@@ -304,7 +304,18 @@ for the record.
 |---|---|---|---|
 | `debug` | no | accepted | development |
 | `staging` | yes (R8) | accepted | checking the shrunk app against a local server; debug-signed, separate application ID suffix `.staging`; never distribute |
-| `release` | yes (R8) | refused: HTTPS only | what you install; needs your own signing key |
+| `release` | yes (R8) | refused: HTTPS only | what you install; the only APK CI builds |
+
+**Release signing.** The release key is a PKCS12 keystore (alias `babytracker`, RSA 4096,
+`CN=BabyTracker`, certificate SHA-256 `39:D1:8E:09:…:C3:AE`) kept outside the repository by
+the maintainer, with a copy in the repository's Actions secrets `ANDROID_KEYSTORE_BASE64`,
+`ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and `ANDROID_KEY_PASSWORD`. CI decodes it into
+the runner's temporary directory, builds with `BT_SIGNING_STORE_FILE`,
+`BT_SIGNING_STORE_PASSWORD`, `BT_SIGNING_KEY_ALIAS`, `BT_SIGNING_KEY_PASSWORD` and
+`BT_VERSION_CODE` (the run number, so every build installs over the previous one), checks the
+signature and deletes the key. Without those variables `assembleRelease` is unsigned. Losing
+the key means the installed app can no longer be updated: it has to be uninstalled, with its
+local data, and installed again.
 
 ## 12. Known gaps
 
@@ -314,8 +325,8 @@ for the record.
 - **AI with a real model**: the Anthropic and OpenAI-compatible providers are tested
   against fake upstream servers and, end to end, against a local stand-in. No request
   has been sent to a real provider.
-- **Release signing**: no signing configuration is committed; `assembleRelease` produces
-  an unsigned APK. The minified code was exercised through the `staging` variant.
+- **Signed release APK**: built and signature-checked locally; the minified code was
+  exercised through the `staging` variant. Not yet installed on a phone.
 - **One baby in the UI**: the data model, API and sync handle several babies; the app
   shows the first one and has no switcher or "add another baby".
 - **Overlapping sleep from two phones** is flagged, not merged automatically.
