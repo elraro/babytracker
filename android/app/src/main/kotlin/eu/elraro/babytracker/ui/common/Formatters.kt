@@ -32,6 +32,9 @@ class Formatters(
     private val date = DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "EEEdMMMM"), locale)
     private val fullDate = DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "dMMMMy"), locale)
     private val shortDate = DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "dM"), locale)
+    private val dayMonth = DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "dMMM"), locale)
+    private val hour =
+        DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, if (is24Hour) "H" else "h"), locale)
 
     fun time(instant: Instant): String = time.format(instant.atZone(zone))
 
@@ -50,6 +53,12 @@ class Formatters(
 
     /** Day and month without the year, for chart axes. */
     fun shortDate(day: LocalDate): String = shortDate.format(day)
+
+    /** Day and abbreviated month, e.g. "11 Oct" / "11 oct". */
+    fun dayMonth(day: LocalDate): String = dayMonth.format(day)
+
+    /** An hour on the clock alone, e.g. "06" or "6 AM", for chart axes. */
+    fun hour(hourOfDay: Int): String = hour.format(LocalTime.of(hourOfDay, 0))
 
     /** Kilograms from grams, e.g. "5.25" / "5,25". */
     fun kilograms(grams: Int): String = decimal(grams / GRAMS_PER_KG, KG_DECIMALS)

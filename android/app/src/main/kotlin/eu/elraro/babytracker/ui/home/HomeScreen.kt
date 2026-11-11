@@ -23,10 +23,12 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import eu.elraro.babytracker.R
 import eu.elraro.babytracker.data.session.Account
 import eu.elraro.babytracker.ui.settings.SettingsScreen
+import eu.elraro.babytracker.ui.stats.SleepChartScreen
 import eu.elraro.babytracker.ui.stats.StatsScreen
 import eu.elraro.babytracker.ui.today.TodayScreen
 import kotlinx.serialization.Serializable
@@ -34,8 +36,15 @@ import kotlinx.serialization.Serializable
 @Serializable
 private data object TodayRoute
 
+/** The Statistics tab: the statistics and the screens opened from them. */
+@Serializable
+private data object StatisticsGraph
+
 @Serializable
 private data object StatisticsRoute
+
+@Serializable
+private data object SleepChartRoute
 
 @Serializable
 private data object SettingsRoute
@@ -49,7 +58,7 @@ private data class Tab(
 private val tabs =
     listOf(
         Tab(TodayRoute, R.string.nav_today, Icons.Outlined.Today),
-        Tab(StatisticsRoute, R.string.nav_statistics, Icons.Outlined.BarChart),
+        Tab(StatisticsGraph, R.string.nav_statistics, Icons.Outlined.BarChart),
         Tab(SettingsRoute, R.string.nav_settings, Icons.Outlined.Settings),
     )
 
@@ -90,8 +99,13 @@ fun HomeScreen(account: Account) {
             composable<TodayRoute> {
                 TodayScreen()
             }
-            composable<StatisticsRoute> {
-                StatsScreen()
+            navigation<StatisticsGraph>(startDestination = StatisticsRoute) {
+                composable<StatisticsRoute> {
+                    StatsScreen(onOpenSleepChart = { navController.navigate(SleepChartRoute) })
+                }
+                composable<SleepChartRoute> {
+                    SleepChartScreen(onBack = { navController.popBackStack() })
+                }
             }
             composable<SettingsRoute> {
                 SettingsScreen(account = account)

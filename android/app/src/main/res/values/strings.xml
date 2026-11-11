@@ -296,6 +296,24 @@ The statistics themselves are always calculated by the app, not by the AI.</stri
     <string name="value_weight_kg">%1$s kg</string>
     <string name="value_length_cm">%1$s cm</string>
     <string name="value_two_parts">%1$s · %2$s</string>
+    <string name="sleep_chart_title">Sleep day by day</string>
+    <string name="sleep_chart_open">See sleep day by day</string>
+    <string name="sleep_chart_empty">The chart appears once a sleep or a bottle has been recorded.</string>
+    <string name="sleep_chart_legend_sleep">Sleep</string>
+    <string name="sleep_chart_legend_awake">Awake between sleeps</string>
+    <string name="sleep_chart_legend_bottle">Bottle</string>
+    <string name="sleep_chart_hours">%1$s h</string>
+    <string name="sleep_chart_detail">%1$s of sleep · %2$s · %3$s</string>
+    <string name="sleep_chart_row_description">%1$s. %2$s</string>
+    <string name="sleep_chart_note">Times are shown in this phone\'s time zone. Gaps of more than 16 hours without a record are left blank.</string>
+    <plurals name="sleep_chart_age">
+        <item quantity="one">%1$d month old</item>
+        <item quantity="other">%1$d months old</item>
+    </plurals>
+    <plurals name="sleep_chart_bottles">
+        <item quantity="one">%1$d bottle (%2$d ml)</item>
+        <item quantity="other">%1$d bottles (%2$d ml)</item>
+    </plurals>
     <string name="stats_growth">Growth</string>
     <string name="growth_weight">Weight</string>
     <string name="growth_height">Height</string>

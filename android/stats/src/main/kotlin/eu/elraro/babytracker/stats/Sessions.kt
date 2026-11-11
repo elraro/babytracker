@@ -10,7 +10,7 @@ const val KIND_NIGHT = "night"
 private val NIGHT_WAKING_MAX: Duration = Duration.ofHours(4)
 
 /** A longer gap between sessions is treated as missing data, not as time awake. */
-private val WAKE_WINDOW_MAX: Duration = Duration.ofHours(16)
+val WAKE_WINDOW_MAX: Duration = Duration.ofHours(16)
 
 /** A normalized sleep interval; [end] is null while the baby is still asleep. */
 data class Session(

@@ -17,6 +17,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -59,6 +60,7 @@ private const val MINUTES_PER_DAY = 24 * 60
 
 @Composable
 fun StatsScreen(
+    onOpenSleepChart: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: StatsViewModel = hiltViewModel(),
 ) {
@@ -70,6 +72,7 @@ fun StatsScreen(
     StatsContent(
         state = state,
         onRange = viewModel::setRange,
+        onOpenSleepChart = onOpenSleepChart,
         modifier = modifier,
         aiCard = { AiCard(ai, onKind = viewModel::setAiKind, onExplain = { viewModel.explain(language) }) },
     )
@@ -80,6 +83,7 @@ fun StatsContent(
     state: StatsUiState,
     onRange: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    onOpenSleepChart: () -> Unit = {},
     aiCard: @Composable () -> Unit = {},
 ) {
     val formatters = rememberFormatters()
@@ -105,7 +109,7 @@ fun StatsContent(
             stats == null -> GrowthCard(state.growth, formatters)
             else -> {
                 FeedingCard(stats.feeding, formatters)
-                SleepCard(stats.sleep, formatters)
+                SleepCard(stats.sleep, formatters, onOpenSleepChart)
                 WakeWindowsCard(stats.wakeWindows)
                 PatternsCard(stats.patterns, formatters)
                 DiapersCard(stats.diapers, formatters)
@@ -355,6 +359,7 @@ private fun DiapersCard(
 private fun SleepCard(
     sleep: Sleep,
     formatters: Formatters,
+    onOpenSleepChart: () -> Unit,
 ) {
     StatsCard(R.string.card_sleep) {
         Figure(
@@ -402,6 +407,9 @@ private fun SleepCard(
             bars = sleep.daily.map { Bar(it.totalS / SECONDS_PER_HOUR, dayLabel(it.date, formatters)) },
             formatValue = { formatters.tenths((it * TENTHS).toInt()) },
         )
+        OutlinedButton(onClick = onOpenSleepChart, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+            Text(stringResource(R.string.sleep_chart_open))
+        }
     }
 }
 
